@@ -17,10 +17,5 @@ Sprites:
 JSON file:
     In my json file I included the title, the subtitle of the page, the starting state of the UI, as well as the title and filepath for every track. In main.js, I have a function that puts all of this information in the spot it's supposed to go.
 
-Aesthetics:
-    I would give myself a 15% on the aesthetics part, not necessarily because I think it's the best looking, but because I'm really proud of myself for making what I had envisioned. It took me a really long time to figure out the arrows, as well as the girl dancing, and then how to make them dance to the beat, but I think it turned out really fun!
 
-    Also, since the professor asked, I did find out another way to do the drop-down for the gui, because I hated the datGUI documentation deeply in my soul. You can just use bootstrap! Just use their dropdown menu and fix the position wherever. I didn't have the fancy color selection controls, but it worked fine for the checkboxes and sliders :D
-
-    Also: I'd recommend trying "The best sound of all" it does something really cool!! <3
 
