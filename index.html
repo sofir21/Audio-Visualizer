@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Audio Visualizer</title>
+  <link href="./styles/default-styles.css" type="text/css" rel="stylesheet" />
+  <script src="./src/loader.js" type="module"></script>
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+  <style>
+    *
+    {
+      background-color: black;
+      color: white;
+	  font-family: Arial, Helvetica, sans-serif; 
+
+    }
+    #heading
+    {
+
+      text-align: center;
+    }
+    #center-canvas
+    {
+      text-align: center;
+    }
+    
+    
+    #controls
+    {
+      text-align: center;
+    }
+    
+    #selection-center{
+      margin:auto;
+      display: flex; 
+      
+
+      flex-direction: column ;
+      justify-content: center;
+    }
+    #choose-track-label
+    {
+      padding-right: 10px;
+
+    }
+    #or-label{
+      padding-right: 10px;
+      
+      padding-left: 10px;
+
+    }
+    /* text gradient animation for title */
+    h1 {
+      
+	  background: linear-gradient(-45deg, #ff0000, #ff00ff, #6355a4, #0000ff, #6355a4);
+	  background-size: 300%;
+	  font-weight: 800;
+	  letter-spacing: -2px;
+	  text-transform: uppercase;
+    
+	  -webkit-background-clip: text;
+	  -webkit-text-fill-color: transparent;
+	  animation: animated_text 5s ease-in-out infinite;
+	  -moz-animation: animated_text 5s ease-in-out infinite;
+	  -webkit-animation: animated_text 5s ease-in-out infinite;
+  }
+
+  @keyframes animated_text {
+  	0% { background-position: 0px 50%; }
+  	50% { background-position: 100% 50%; }
+  	100% { background-position: 0px 50%; }
+  } 
+
+  h2{
+    margin-top: 3px;
+    padding-top:0px;
+    font-weight: 200;
+	  letter-spacing: -1px;
+  }
+
+.control-button {
+  
+  background: linear-gradient(-45deg,  #ff00ff, #0000ff);
+
+  animation: animated_text 5s ease-in-out infinite;
+  background-size: 200% 200%;
+
+
+  border-radius: 8px;
+  border-style: none;
+  box-sizing: border-box;
+  color: #FFFFFF;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 500;
+  height: 40px;
+  line-height: 20px;
+  list-style: none;
+  margin: 0;
+  outline: none;
+  padding: 0px 16px;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  transition: color 100ms;
+  vertical-align: baseline;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+
+}
+@keyframes rainbow {
+    0% { background-position: 100% 100% }
+  100% { background-position: 0% 0% }
+}
+
+button:hover,
+button:focus {
+  background-color: #F082AC;
+}
+/* dropdown at top right */
+.dropdown{
+  position: fixed; top: 0; right: 0; border: 0;
+}
+
+.checkbox-menu
+{background-color:black;}
+
+.checkbox-menu li.active label {
+    background-color: white;
+    font-weight:bold;
+}
+
+
+#dropdownMenu1{
+  background-color: black;
+  min-width: 250px;
+  
+}
+.controller-type
+{
+   background: linear-gradient(-45deg, #ff00ff, #6355a4);
+	  background-size: 300%;
+	  font-weight: 700;
+	  letter-spacing: -1px;
+	  text-transform: uppercase;
+    
+	  -webkit-background-clip: text;
+	  -webkit-text-fill-color: transparent;
+	  animation: animated_text 5s ease-in-out infinite;
+	  -moz-animation: animated_text 5s ease-in-out infinite;
+	  -webkit-animation: animated_text 5s ease-in-out infinite;
+}
+
+
+   
+
+  </style>
+</head>
+<body>
+<main>
+  <div id="heading">
+    <h1>Dance, Kobeni, Dance!</h1>
+    <h2>Audio Visualizer by Sofia Rivas</h2>
+
+  </div>
+  
+  <div id="#canvas-container">
+    <p id="center-canvas">
+      <canvas id="center-canvas" width="800" height="400"></canvas>
+    </p>
+  </div>
+  
+  <div id="controls">
+    <section>
+      <button class = "control-button" id="button-play" data-playing="no"></button>
+      <button class = "control-button" id="button-fullScreen">Full Screen</button>
+    </section>
+
+    <section id="track-selection-controls">
+      <div id="slection-center">
+        <label id="choose-track-label">Choose Track: 
+          <select id="trackSelect">
+            
+            
+            <option id="track2" value="???" selected>???</option> <!-- i like to move it !-->
+            <option id="track3" value="???">???</option> <!-- the best sound of all !-->
+            <option id="track6" value="???">???</option> <!-- tablet !-->
+            <option id="track4" value="???" >???</option> <!-- friday night !-->
+            <option id="track5" value="???" >???</option> <!-- boogie wonderland !-->
+            <option id="track1" value="???" >???</option> <!-- gas gas gas !-->
+            <option id="track7" value="???" >???</option> <!-- death by glamour !-->
+          </select>
+        </label>
+        <label id="or-label">OR</label>
+        <label id="upload-label">
+          Upload your own MP3! <input type="file" id="trackUpload" title="Upload File" />
+        </label>
+
+      </div>
+      
+      
+    </section>
+
+    <section>
+      <div class="dropdown">
+        <button class="btn btn-default dropdown-toggle" type="button" 
+                id="dropdownMenu1" data-toggle="dropdown" 
+                aria-haspopup="true" aria-expanded="true">
+          <i class="glyphicon glyphicon-cog"></i>
+          <span class="caret"></span>
+        Controls</button>
+        <ul class="dropdown-menu checkbox-menu allow-focus" aria-labelledby="dropdownMenu1">
+
+          
+            <label class="controller-type">Audio Controls:</label>
+            
+          <li>
+
+          </li>
+          <label>
+            Volume: 
+            <input type="range" id="slider-volume" min="0" max="2" value="1" step="0.01">
+            <span id="volumeLabel">???</span>
+          </label>
+            
+          <li>
+            <li>
+              <span><label for="checkbox-waveform">Waveform</label><input type="checkbox" id="checkbox-waveform"checked></span>
+            </li>
+          <li>
+            <span><label for="checkbox-highshelf">Highshelf Filter (Treble)</label><input type="checkbox" id="checkbox-highshelf"></span>
+          </li>
+          <li>
+			      <span><label for="checkbox-lowshelf">Lowshelf Filter (Bass)</label><input type="checkbox" id="checkbox-lowshelf"></span>
+          </li>
+
+
+            
+            <label class="controller-type">Visualizer Controls:</label>
+            
+          </li>
+          <li >
+            <label>
+              <input id="checkbox-bars" type="checkbox" checked> Bars
+            </label>
+          </li>
+          
+          <li >
+            <label>
+              <input id="checkbox-gradient" type="checkbox"> Gradient
+            </label>
+          </li>
+          
+          <li >
+            <label>
+              <input id="checkbox-circle" type="checkbox"> Circles
+            </label>
+          </li>
+          <li >
+            <label>
+              <input id="checkbox-noise"type="checkbox"> Noise
+            </label>
+          </li>
+          <li >
+            <label>
+              <input id="checkbox-invert"type="checkbox"> Invert
+            </label>
+          </li>
+          <li >
+            <label>
+              <input id="checkbox-emboss"type="checkbox"> Emboss
+            </label>
+          </li>
+          <li>
+            Dance Speed: <input type="range" id="slider-danceSpeed" min="0" max="200" value="40" step="1">
+            <span id="danceLabel">???</span>
+          </li>
+          <li>
+            Arrow Spawn Speed: <input type="range" id="slider-arrowSpeed" min="0" max="200" value="35" step="1">
+            <span id="arrowLabel">???</span>
+          </li>
+          
+        </ul>
+      </div>
+    </section>
+  </div>
+
+
+<!-- IMAGES -->
+  <img src = "./media/ddrarrows.png"  id = "arrows" alt = "arrows" hidden="hidden">
+  <img src = "./media/ddrmachine.png"  id = "machine" alt = "machine" hidden="hidden">
+  <img src = "./media/ddrbars.png"  id = "bars" alt = "bars" hidden="hidden">
+  <img src = "./media/kobeni1.png"  id = "kobeni1" alt = "kobeni1" hidden="hidden">
+  <img src = "./media/kobeni2.png"  id = "kobeni2" alt = "kobeni2" hidden="hidden">
+  <img src = "./media/kobeni3.png"  id = "kobeni3" alt = "kobeni3" hidden="hidden">
+  <img src = "./media/kobeni4.png"  id = "kobeni4" alt = "kobeni4" hidden="hidden">
+  <img src = "./media/kobeni5.png"  id = "kobeni5" alt = "kobeni5" hidden="hidden">
+
+
+
+
+
+</main>
+</body>
+<script>
+  // keeps menu open
+  $(document).on('click', '.allow-focus', function (e) {
+  e.stopPropagation();
+});
+</script>
+</html>

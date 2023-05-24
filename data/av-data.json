@@ -1,0 +1,47 @@
+{
+    "title": "Dance, Kobeni, Dance!",
+    "subtitle" : "Audio Visualizer by Sofia Rivas",
+
+    "tracks": {
+        "track1": {
+            "title": "Gas Gas Gas",
+            "file": "./media/Gas Gas Gas.mp3"
+        },
+        "track2":
+        {
+            "title":"I Like To Move It",
+            "file":"./media/I Like To Move It.mp3"
+        },
+        "track3": {
+            "title": "The Best Sound of All",
+            "file": "./media/Inconspicuous Sound.mp3"
+        },
+        "track4": {
+            "title": "Friday Night",
+            "file": "./media/Friday Night.mp3"
+        },
+        "track5": {
+            "title":"Boogie Wonderland",
+            "file": "./media/Boogie Wonderland.mp3"
+        },
+        "track6": {
+            "title": "Tablet",
+            "file": "./media/tablet.mp3"
+        },
+        "track7":{
+            "title": "Death By Glamour",
+            "file": "./media/Death By Glamour.mp3"
+        }
+            
+    },
+
+    "parameters": {
+        "gradient": "",
+        "bars": "true",
+        "circles": "",
+        "noise": "",
+        "invert": "",
+        "emboss": ""
+    }
+
+}
