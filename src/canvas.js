@@ -37,7 +37,6 @@ let lastTime = 0;
 let deltaTime = 0;
 let spawnTimer = 2.5;
 let spawnedArrows = [];
-let backgroundArrows = [];
 let scrollSpeed;
 let spawnSpeed;
 let arrowSpeedSelection = 35;
@@ -53,6 +52,8 @@ let arrowx1, arrowx2, arrowx3, arrowx4;
 let score; //score
 let totalScore; //total score possible
 let scoreDisplayed; //text displayed on screen
+let combo;
+let maxCombo;
 let displayedPopups = [];
 let currentKeyPressed; //key currently pressed
 const keyPressedValueCheck = (e) =>
@@ -241,6 +242,8 @@ const setupCanvas = (canvasElement,analyserNodeRef, img) => {
     totalScore = 0;
     score = 0;
     currentKeyPressed = 0;
+    combo = 0;
+    maxCombo = 0;
 
     
 
@@ -523,6 +526,7 @@ const draw = (params={}, time=0) =>{
 
                 //change score
                 score +=1; 
+                combo +=1;
 
                 //visual feedback
                 displayedPopups.push(new popUp(`Hit!`, 10, "gray"));
@@ -541,9 +545,8 @@ const draw = (params={}, time=0) =>{
             spawnedArrows.splice(i,1);
 
             //miss visual feedback
-            
             displayedPopups.push(new popUp(`Miss!`, 10, "maroon"));
-
+            resetCombo(); //reset combo
             break;
         }           
         spawnedArrows[i].updateArrow(size, deltaTime,scrollSpeed);
@@ -611,13 +614,25 @@ const draw = (params={}, time=0) =>{
     ctx.fillStyle = "white";
     if(isNaN(Math.floor(score/totalScore*100)))
     {
-        ctx.fillText(`Accuracy : 0%`, 450,30);
+        ctx.fillText(`Accuracy : 0%`, 380,30);
         
     }
     else
     {
-        ctx.fillText(`Accuracy : ${scoreDisplayed}%`, 450,30);
+        ctx.fillText(`Accuracy : ${scoreDisplayed}%`, 380,30);
     }
+    ctx.fillText(`Combo : ${combo}`, 380,60);
+
+
+    if(combo>maxCombo)
+    {
+        ctx.fillText(`Max Combo : ${combo}`, 380,90);
+    }    
+    else
+    {
+        ctx.fillText(`Max Combo : ${maxCombo}`, 380,90);
+    }
+    
     
     
     
@@ -647,6 +662,17 @@ const resetScore = () =>
 {
     score = 0;
     totalScore = 0;
+}
+
+const resetCombo = () =>
+{
+    //save combo if it's the highest that has been hit.
+    if(combo > maxCombo)
+    {
+        maxCombo = combo;
+    }
+    //reset combo
+    combo = 0;
 }
 
 
