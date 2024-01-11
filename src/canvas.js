@@ -52,6 +52,8 @@ let arrowx1, arrowx2, arrowx3, arrowx4;
 //score per notes hit
 let score; //score
 let totalScore; //total score possible
+let scoreDisplayed; //text displayed on screen
+let displayedPopups = [];
 let currentKeyPressed; //key currently pressed
 const keyPressedValueCheck = (e) =>
 {
@@ -69,6 +71,22 @@ const keyPressedValueCheck = (e) =>
         case 39: //right
             currentKeyPressed = 4;
             break;
+
+
+            case 68: //left
+            currentKeyPressed = 1;
+            break;
+        case 70: //down
+            currentKeyPressed = 2;
+            break;
+        case 74: //up
+            currentKeyPressed = 3;
+            break;
+        case 75: //right
+            currentKeyPressed = 4;
+            break;
+
+
         default: //other
             currentKeyPressed = 0;
       
@@ -114,6 +132,31 @@ class Kobeni
         ctx.drawImage(this.sprites[this.frame], this.x, this.y, (this.sprites[this.frame].width)/2, (this.sprites[this.frame].height)/2);
     }
 
+}
+
+class popUp {
+    constructor(textDisplayed, framesDisplayed, color, xValue)
+    {
+        this.framesDisplayed = framesDisplayed;
+        this.textDisplayed =textDisplayed;
+        this.color = color;
+        this.xValue = utils.getRandom(50,200);
+    }
+    
+    updatePopup = () =>
+    {
+        this.drawPopup();
+        this.framesDisplayed -=1;
+    }
+    drawPopup = () =>
+    {
+        ctx.save();
+        ctx.font = "bold 40px serif";
+        ctx.fillStyle = this.color;
+        //utils.getRandom(50,200)
+        ctx.fillText(this.textDisplayed, this.xValue,30);
+        ctx.restore();
+    }
 }
 
 class arrows {
@@ -226,15 +269,6 @@ const draw = (params={}, time=0) =>{
     for(let i = 0; i < audioData.length; i++){
         percent += audioData[i] / 255;
     }
-    // if(params.showWaveformData == true)
-    // {
-    //     percent -= 64.25098039215669;
-    // }
-    // if(percent <0)
-    // {
-    //     percent = 0;
-    // }
-
     //#endregion
 
     //#region BACKGROUND
@@ -396,7 +430,7 @@ const draw = (params={}, time=0) =>{
     {
         size = 60;
     }
-    scrollSpeed = 100;
+    scrollSpeed = 50;
     spawnSpeed = arrowSpeedSelection * percentArrows; //arrows spawn to the music
 
     //#region BG arrows
@@ -422,14 +456,11 @@ const draw = (params={}, time=0) =>{
     ctx.drawImage(arrowimg, 
     168*3, 0, 166, 168,
     arrowx4, 30, size*1.2, size*1.2);
-    
-    ctx.restore();
-      
-    
     //#endregion BG arrows
+    ctx.restore();
     
     //spawns new arrows to the beat
-    if(spawnTimer > (3/spawnSpeed)){
+    if(spawnTimer > (1/spawnSpeed)){
         if ((percent >=50 && percent <=53 )|| (percent >=85 && percent <=86 )) //chance for double arrows (left right) to spawn
         {
             spawnedArrows.push(new arrows(
@@ -446,7 +477,7 @@ const draw = (params={}, time=0) =>{
                 ));
                 totalScore += 2;
         }
-        else if (percent >=60 && percent <=63 || (percent >=90 && percent <=90.4 )) //chance for double arrows (up down) to spawn
+        else if ((percent >=60 && percent <=62) || (percent >=92.028 && percent <=92.03 )) //chance for double arrows (up down) to spawn
         {
             spawnedArrows.push(new arrows(
                 arrowimg, //img
@@ -477,19 +508,15 @@ const draw = (params={}, time=0) =>{
         spawnTimer = 0;
     }
 
-    //arrow checks
-
-
-
-   
-
-    //if a key is pressed
+    //#region ARROW MANAGER
+    //if a key is pressed in time up score
     if (currentKeyPressed != 0 )
     {
         //run through all arrows
         for(let i = 0; i < spawnedArrows.length; i++){
             
-            if(spawnedArrows[i].arrowY < 90 && spawnedArrows[i].arrowY > 10 && currentKeyPressed == spawnedArrows[i].direction) 
+            spawnedArrows[i].updateArrow(size, deltaTime,scrollSpeed);
+            if(spawnedArrows[i].arrowY < 80 && spawnedArrows[i].arrowY >-10 && currentKeyPressed == spawnedArrows[i].direction) 
             {
                 //remove arrow
                 spawnedArrows.splice(i,1);
@@ -498,91 +525,51 @@ const draw = (params={}, time=0) =>{
                 score +=1; 
 
                 //visual feedback
-                ctx.font = "40px serif";
-                ctx.fillStyle = "white";
+                displayedPopups.push(new popUp(`Hit!`, 10, "gray"));
                 
-                ctx.fillText(`Hit!`, 140+(size/2),30);
 
-                //attempting to add
-                // ctx.save();
-                // switch(spawnedArrows[i].direction)
-                // {
-                //     case 1:
-                //         //left Arrow
-                //     // ctx.drawImage(arrowimg, 
-                //     // 0, 0, 166, 168,
-                //     // arrowx1, 30, size*1.2, size*1.2);
-                    
-                //     // ctx.globalCompositeOperation = "source-in";
-                //     ctx.fillStyle = "blue";
-                //     ctx.fillRect(0, 0, size*1.2, size*1.2);
-                //         break;
-                //     case 2:
-                //         //down arrow
-                //     // ctx.drawImage(arrowimg, 
-                //     // 168, 0, 166, 168,
-                //     // arrowx2, 30, size*1.2, size*1.2);
-                    
-                //     // ctx.globalCompositeOperation = "source-in";
-                //     ctx.fillStyle = "blue";
-                //     ctx.fillRect(168, 0, size*1.2, size*1.2);
-                //         break;
-                //     case 3:
-                //         //up arrow
-                //     // ctx.drawImage(arrowimg, 
-                //     // 168*2, 0, 166, 168,
-                //     // arrowx3, 30, size*1.2, size*1.2);
-                    
-                //     // ctx.globalCompositeOperation = "source-in";
-                //     ctx.fillStyle = "blue";
-                //     ctx.fillRect(168*2, 0, size*1.2, size*1.2);
-                //         break;
-                //     case 4:
-                //         //right arrow
-                //     // ctx.drawImage(arrowimg, 
-                //     // 168*3, 0, 166, 168,
-                //     // arrowx4, 30, size*1.2, size*1.2);
-                    
-                //     // ctx.globalCompositeOperation = "source-in";
-                //     ctx.fillStyle = "blue";
-                //     ctx.fillRect(168*3, 0, size*1.2, size*1.2);
-                //         break;
-                //     default:
-                //         //right arrow
-                //     // ctx.drawImage(arrowimg, 
-                //     // 168*3, 0, 166, 168,
-                //     // arrowx4, 30, size*1.2, size*1.2);
-                    
-                //     // ctx.globalCompositeOperation = "source-in";
-                //     ctx.fillStyle = "blue";
-                //     ctx.fillRect(168*3, 0, size*1.2, size*1.2);
-                // }
-            
-                // ctx.restore();
-
-                break;
             }           
-            spawnedArrows[i].updateArrow(size, deltaTime,scrollSpeed);
+            
+            updateScore();
         }
     }
-
+    //if key wasn't pressed in time delete arrow
     for(let i = 0; i < spawnedArrows.length; i++){
         //removes arrow once it's gone past the height height they're removed ( (spawnedArrows[i].arrowY < 50) )
-        if(spawnedArrows[i].arrowY < 0) 
+        if(spawnedArrows[i].arrowY < -10) 
         {
             spawnedArrows.splice(i,1);
 
             //miss visual feedback
-            ctx.font = "40px serif";
-            ctx.fillStyle = "red";       
-            ctx.fillText(`Miss!`, 140+(size/2),30);
+            
+            displayedPopups.push(new popUp(`Miss!`, 10, "maroon"));
 
             break;
         }           
         spawnedArrows[i].updateArrow(size, deltaTime,scrollSpeed);
+        updateScore();
     }
-    
     currentKeyPressed = 0;
+
+    //#endregion ARROW MANAGER
+
+
+    //drawing pop ups
+    if (displayedPopups.length != 0)
+    {
+        for(let i = 0; i < displayedPopups.length; i++)
+        {
+            displayedPopups[i].updatePopup();
+            if(displayedPopups[i].framesDisplayed == 0)
+            {
+                displayedPopups.splice(i,1);
+            }  
+            
+        }
+    }
+
+
+
 
 
     ctx.restore();
@@ -629,10 +616,10 @@ const draw = (params={}, time=0) =>{
     }
     else
     {
-        ctx.fillText(`Accuracy : ${Math.floor(score/totalScore*100)}%`, 450,30);
+        ctx.fillText(`Accuracy : ${scoreDisplayed}%`, 450,30);
     }
     
-    ctx.strokeStyle = "black";
+    
     
 
     //#endregion SCORE TEXT
@@ -651,11 +638,18 @@ const setArrowSpeed =(value)=>
     arrowSpeedSelection = Number(value);   // make sure that it's a Number rather than a String
 }
 
+const updateScore = () =>
+{
+    scoreDisplayed = Math.floor(score/totalScore*100);
+}
+
 const resetScore = () =>
 {
     score = 0;
     totalScore = 0;
 }
+
+
 
 
   
