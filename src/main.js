@@ -166,6 +166,7 @@ const setupUI = (canvasElement) =>{
   // add .onchange event to <select>
   trackSelect.onchange = e =>{
     audio.loadSoundFile(e.target.value);
+    canvas.resetScore();
     // pause the current track if it is playing
     if(playButton.dataset.playing == "yes")
     {

@@ -37,6 +37,7 @@ let lastTime = 0;
 let deltaTime = 0;
 let spawnTimer = 2.5;
 let spawnedArrows = [];
+let backgroundArrows = [];
 let scrollSpeed;
 let spawnSpeed;
 let arrowSpeedSelection = 35;
@@ -46,6 +47,36 @@ const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 let arrowx1, arrowx2, arrowx3, arrowx4;
 [arrowx1, arrowx2, arrowx3, arrowx4] = [20, 100, 180, 260]; 
 
+
+
+//score per notes hit
+let score; //score
+let totalScore; //total score possible
+let currentKeyPressed; //key currently pressed
+const keyPressedValueCheck = (e) =>
+{
+    switch(e.keyCode)
+    {
+        case 37: //left
+            currentKeyPressed = 1;
+            break;
+        case 40: //down
+            currentKeyPressed = 2;
+            break;
+        case 38: //up
+            currentKeyPressed = 3;
+            break;
+        case 39: //right
+            currentKeyPressed = 4;
+            break;
+        default: //other
+            currentKeyPressed = 0;
+      
+    }
+    return currentKeyPressed;
+}
+//checks if key was pressed 
+addEventListener('keydown', keyPressedValueCheck, false);
 //#endregion variables
 
 
@@ -93,22 +124,30 @@ class arrows {
         //make it spawn in the same location (arrowX) as other arrows of that direction
         switch(direction)
         {
-            case 1:
+            case 1://left
                 this.imgx = 0; 
                 this.arrowX = arrowx1; 
+                this.direction = 1;
                 break;
-            case 2:
+            case 2://down
                 this.imgx = 168; 
                 this.arrowX= arrowx2;
+                this.direction = 2;
                 break;
-            case 3: 
+            case 3: //up
             this.imgx = 168 *2; 
             this.arrowX = arrowx3;
-
+            this.direction =3;
+                break;
+            case 4: //right
+            this.imgx= 168 *3; 
+            this.arrowX = arrowx4;
+            this.direction =4;
                 break;
             default:
                 this.imgx= 168 *3; 
                 this.arrowX = arrowx4;
+                this.direction =4;
         }
         this.imgy = 0; 
         this.imgw=166;
@@ -155,6 +194,12 @@ const setupCanvas = (canvasElement,analyserNodeRef, img) => {
     
     audioDataWF = new Uint8Array(analyserNode.fftSize/2);
 
+    //score set up
+    totalScore = 0;
+    score = 0;
+    currentKeyPressed = 0;
+
+    
 
     //creates kobeni objext
     kobeni = (new Kobeni(canvasWidth/2+130, canvasHeight/2-200));
@@ -341,15 +386,15 @@ const draw = (params={}, time=0) =>{
     //#endregion DDR MACHINE FOREGROUND
 
     //#region DDR ARROWS 
-    let maxSize = canvasHeight/6;
+    let maxSize = canvasHeight/7;
 
     ctx.save();
     let percentArrows = percent;
     percentArrows /= (audioData.length / 2);
     let size = percentArrows * maxSize *1.1;
-    if(size< 50)
+    if(size< 60)
     {
-        size = 50;
+        size = 60;
     }
     scrollSpeed = 100;
     spawnSpeed = arrowSpeedSelection * percentArrows; //arrows spawn to the music
@@ -357,46 +402,195 @@ const draw = (params={}, time=0) =>{
     //#region BG arrows
     ctx.save();
     ctx.globalCompositeOperation = "luminosity";
+
+    //left Arrow
     ctx.drawImage(arrowimg, 
     0, 0, 166, 168,
     arrowx1, 30, size*1.2, size*1.2);
+    
+    //down arrow
     ctx.drawImage(arrowimg, 
     168, 0, 166, 168,
     arrowx2, 30, size*1.2, size*1.2);
+
+    //up arrow
     ctx.drawImage(arrowimg, 
     168*2, 0, 166, 168,
     arrowx3, 30, size*1.2, size*1.2);
+
+    //right arrow
     ctx.drawImage(arrowimg, 
     168*3, 0, 166, 168,
     arrowx4, 30, size*1.2, size*1.2);
+    
     ctx.restore();
+      
+    
     //#endregion BG arrows
     
-    //spawns new arrows to th ebeat
+    //spawns new arrows to the beat
     if(spawnTimer > (3/spawnSpeed)){
-        spawnedArrows.push(new arrows(
-            arrowimg, //img
-            Math.floor(utils.getRandom(0,3.1)), //direction randomized
-            arrowimg.width, //w
-            arrowimg.height //h
-            ));
+        if ((percent >=50 && percent <=53 )|| (percent >=85 && percent <=86 )) //chance for double arrows (left right) to spawn
+        {
+            spawnedArrows.push(new arrows(
+                arrowimg, //img
+                Math.floor(1), //left
+                arrowimg.width, //w
+                arrowimg.height //h
+                ));
+            spawnedArrows.push(new arrows(
+                arrowimg, //img
+                Math.floor(4), //right
+                arrowimg.width, //w
+                arrowimg.height //h
+                ));
+                totalScore += 2;
+        }
+        else if (percent >=60 && percent <=63 || (percent >=90 && percent <=90.4 )) //chance for double arrows (up down) to spawn
+        {
+            spawnedArrows.push(new arrows(
+                arrowimg, //img
+                Math.floor(2), //up
+                arrowimg.width, //w
+                arrowimg.height //h
+                ));
+            spawnedArrows.push(new arrows(
+                arrowimg, //img
+                Math.floor(3), //down
+                arrowimg.width, //w
+                arrowimg.height //h
+                ));
+            totalScore += 2;
+        }
+        else //regular arrow spawn
+        {
+            spawnedArrows.push(new arrows(
+                arrowimg, //img
+                Math.floor(utils.getRandom(0,4.1)), //direction randomized
+                arrowimg.width, //w
+                arrowimg.height //h
+                ));
+                totalScore += 1;
+        }
+        
+        
         spawnTimer = 0;
     }
 
-    //animates arrows
+    //arrow checks
+
+
+
+   
+
+    //if a key is pressed
+    if (currentKeyPressed != 0 )
+    {
+        //run through all arrows
+        for(let i = 0; i < spawnedArrows.length; i++){
+            
+            if(spawnedArrows[i].arrowY < 90 && spawnedArrows[i].arrowY > 10 && currentKeyPressed == spawnedArrows[i].direction) 
+            {
+                //remove arrow
+                spawnedArrows.splice(i,1);
+
+                //change score
+                score +=1; 
+
+                //visual feedback
+                ctx.font = "40px serif";
+                ctx.fillStyle = "white";
+                
+                ctx.fillText(`Hit!`, 140+(size/2),30);
+
+                //attempting to add
+                // ctx.save();
+                // switch(spawnedArrows[i].direction)
+                // {
+                //     case 1:
+                //         //left Arrow
+                //     // ctx.drawImage(arrowimg, 
+                //     // 0, 0, 166, 168,
+                //     // arrowx1, 30, size*1.2, size*1.2);
+                    
+                //     // ctx.globalCompositeOperation = "source-in";
+                //     ctx.fillStyle = "blue";
+                //     ctx.fillRect(0, 0, size*1.2, size*1.2);
+                //         break;
+                //     case 2:
+                //         //down arrow
+                //     // ctx.drawImage(arrowimg, 
+                //     // 168, 0, 166, 168,
+                //     // arrowx2, 30, size*1.2, size*1.2);
+                    
+                //     // ctx.globalCompositeOperation = "source-in";
+                //     ctx.fillStyle = "blue";
+                //     ctx.fillRect(168, 0, size*1.2, size*1.2);
+                //         break;
+                //     case 3:
+                //         //up arrow
+                //     // ctx.drawImage(arrowimg, 
+                //     // 168*2, 0, 166, 168,
+                //     // arrowx3, 30, size*1.2, size*1.2);
+                    
+                //     // ctx.globalCompositeOperation = "source-in";
+                //     ctx.fillStyle = "blue";
+                //     ctx.fillRect(168*2, 0, size*1.2, size*1.2);
+                //         break;
+                //     case 4:
+                //         //right arrow
+                //     // ctx.drawImage(arrowimg, 
+                //     // 168*3, 0, 166, 168,
+                //     // arrowx4, 30, size*1.2, size*1.2);
+                    
+                //     // ctx.globalCompositeOperation = "source-in";
+                //     ctx.fillStyle = "blue";
+                //     ctx.fillRect(168*3, 0, size*1.2, size*1.2);
+                //         break;
+                //     default:
+                //         //right arrow
+                //     // ctx.drawImage(arrowimg, 
+                //     // 168*3, 0, 166, 168,
+                //     // arrowx4, 30, size*1.2, size*1.2);
+                    
+                //     // ctx.globalCompositeOperation = "source-in";
+                //     ctx.fillStyle = "blue";
+                //     ctx.fillRect(168*3, 0, size*1.2, size*1.2);
+                // }
+            
+                // ctx.restore();
+
+                break;
+            }           
+            spawnedArrows[i].updateArrow(size, deltaTime,scrollSpeed);
+        }
+    }
+
     for(let i = 0; i < spawnedArrows.length; i++){
-        if(spawnedArrows[i].arrowY < 50)
+        //removes arrow once it's gone past the height height they're removed ( (spawnedArrows[i].arrowY < 50) )
+        if(spawnedArrows[i].arrowY < 0) 
         {
             spawnedArrows.splice(i,1);
+
+            //miss visual feedback
+            ctx.font = "40px serif";
+            ctx.fillStyle = "red";       
+            ctx.fillText(`Miss!`, 140+(size/2),30);
+
             break;
-        } 
+        }           
         spawnedArrows[i].updateArrow(size, deltaTime,scrollSpeed);
     }
+    
+    currentKeyPressed = 0;
+
+
     ctx.restore();
     spawnTimer += deltaTime;
     //#endregion DDR ARROWS
 
     //#region BITMAP MANIPULATION
+
     let imageData = ctx.getImageData(0,0,canvasWidth,canvasHeight);
     let data = imageData.data;
     let length = data.length;
@@ -424,6 +618,24 @@ const draw = (params={}, time=0) =>{
     }
     ctx.putImageData(imageData,0,0);
     //#endregion BITMAP MANIPULATION
+
+    //#region SCORE TEXT
+    ctx.font = "20px serif";
+    ctx.fillStyle = "white";
+    if(isNaN(Math.floor(score/totalScore*100)))
+    {
+        ctx.fillText(`Accuracy : 0%`, 450,30);
+        
+    }
+    else
+    {
+        ctx.fillText(`Accuracy : ${Math.floor(score/totalScore*100)}%`, 450,30);
+    }
+    
+    ctx.strokeStyle = "black";
+    
+
+    //#endregion SCORE TEXT
 }
 
 
@@ -439,5 +651,12 @@ const setArrowSpeed =(value)=>
     arrowSpeedSelection = Number(value);   // make sure that it's a Number rather than a String
 }
 
+const resetScore = () =>
+{
+    score = 0;
+    totalScore = 0;
+}
+
+
   
-export {setupCanvas, setDanceSpeed, setArrowSpeed, draw};
+export {setupCanvas, setDanceSpeed, setArrowSpeed, draw, resetScore};
