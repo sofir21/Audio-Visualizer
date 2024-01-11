@@ -51,6 +51,8 @@ const jsonLoaded = json =>
   document.querySelector(`#track5`).value = json.tracks.track5.file;
   document.querySelector(`#track6`).value = json.tracks.track6.file;
   document.querySelector(`#track7`).value = json.tracks.track7.file;
+  document.querySelector(`#track8`).value = json.tracks.track8.file;
+  document.querySelector(`#track9`).value = json.tracks.track9.file;
 
 
   //set up text on track selector
@@ -61,6 +63,9 @@ const jsonLoaded = json =>
   document.querySelector(`#track5`).text = json.tracks.track5.title;
   document.querySelector(`#track6`).text = json.tracks.track6.title;
   document.querySelector(`#track7`).text = json.tracks.track7.title;
+  document.querySelector(`#track8`).text = json.tracks.track8.title;
+  document.querySelector(`#track9`).text = json.tracks.track9.title;
+
 
   drawParams.showGradient = json.parameters.gradient;
   drawParams.showBars = json.parameters.bars;

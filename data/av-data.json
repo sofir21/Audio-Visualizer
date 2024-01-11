@@ -31,7 +31,16 @@
         "track7":{
             "title": "Death By Glamour",
             "file": "./media/Death By Glamour.mp3"
+        },
+        "track8":{
+            "title": "Coconut Mall",
+            "file": "./media/Coconut Mall.mp3"
+        },
+        "track9":{
+            "title": "Night of Nights",
+            "file": "./media/Night of Nights.mp3"
         }
+
             
     },
 
