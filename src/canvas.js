@@ -41,6 +41,7 @@ let scrollSpeed;
 let spawnSpeed;
 let arrowSpeedSelection = 35;
 const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
+const framesElapsed = 2;
 
 //set up arrow spawns
 let arrowx1, arrowx2, arrowx3, arrowx4;
@@ -55,44 +56,56 @@ let scoreDisplayed; //text displayed on screen
 let combo;
 let maxCombo;
 let displayedPopups = [];
-let currentKeyPressed; //key currently pressed
+let currentKeyPressed = []; //key currently pressed
+let lastPressedDeltaTime;
 const keyPressedValueCheck = (e) =>
 {
-    switch(e.keyCode)
+   if(currentKeyPressed.length >= 2 || lastPressedDeltaTime > 0.001)
     {
-        case 37: //left
-            currentKeyPressed = 1;
-            break;
-        case 40: //down
-            currentKeyPressed = 2;
-            break;
-        case 38: //up
-            currentKeyPressed = 3;
-            break;
-        case 39: //right
-            currentKeyPressed = 4;
-            break;
-
-
-            case 68: //left
-            currentKeyPressed = 1;
-            break;
-        case 70: //down
-            currentKeyPressed = 2;
-            break;
-        case 74: //up
-            currentKeyPressed = 3;
-            break;
-        case 75: //right
-            currentKeyPressed = 4;
-            break;
-
-
-        default: //other
-            currentKeyPressed = 0;
-      
+        lastPressedDeltaTime = 0;
+        currentKeyPressed = [];
     }
-    return currentKeyPressed;
+    else 
+    {
+            //#region KeyAssignment
+        switch(e.keyCode)
+        {
+            case 37: //left
+                currentKeyPressed.push(1);
+
+                break;
+            case 40: //down
+                currentKeyPressed.push(2);
+                break;
+            case 38: //up
+                currentKeyPressed.push(3);
+                break;
+            case 39: //right
+                currentKeyPressed.push(4);
+                break;
+
+
+                case 68: //left
+                currentKeyPressed.push(1);
+                break;
+            case 70: //down
+                currentKeyPressed.push(2);
+                break;
+            case 74: //up
+                currentKeyPressed.push(3);
+                break;
+            case 75: //right
+                currentKeyPressed.push(4);
+                break;
+
+
+            default: //other
+                currentKeyPressed.push(0);
+        
+        }
+        //#endregion KeyAssignment
+    }
+
 }
 //checks if key was pressed 
 addEventListener('keydown', keyPressedValueCheck, false);
@@ -241,9 +254,10 @@ const setupCanvas = (canvasElement,analyserNodeRef, img) => {
     //score set up
     totalScore = 0;
     score = 0;
-    currentKeyPressed = 0;
+    currentKeyPressed = [];
     combo = 0;
     maxCombo = 0;
+
 
     
 
@@ -258,7 +272,6 @@ const setupCanvas = (canvasElement,analyserNodeRef, img) => {
 
 const draw = (params={}, time=0) =>{
     //#region VARIABLES
-    
     analyserNode.getByteFrequencyData(audioData);
     
     
@@ -266,8 +279,12 @@ const draw = (params={}, time=0) =>{
     
     deltaTime = (time - lastTime)/1000;
     deltaTime = clamp(deltaTime,1/144,1/12);
+
+    lastPressedDeltaTime = (time - lastTime)/1000;
+    lastPressedDeltaTime = clamp(deltaTime,1/144,1/12);
+ 
     lastTime = time;
-    
+ 
     let percent = 0;
     for(let i = 0; i < audioData.length; i++){
         percent += audioData[i] / 255;
@@ -513,13 +530,19 @@ const draw = (params={}, time=0) =>{
 
     //#region ARROW MANAGER
     //if a key is pressed in time up score
-    if (currentKeyPressed != 0 )
+    if (currentKeyPressed.length != 0 )
     {
-        //run through all arrows
-        for(let i = 0; i < spawnedArrows.length; i++){
+        currentKeyPressed.forEach(element => {
+            if(element == 0)
+            {
+                return;
+            }
+            
+            //run through all arrows
+            for(let i = 0; i < spawnedArrows.length; i++){
             
             spawnedArrows[i].updateArrow(size, deltaTime,scrollSpeed);
-            if(spawnedArrows[i].arrowY < 80 && spawnedArrows[i].arrowY >-10 && currentKeyPressed == spawnedArrows[i].direction) 
+            if(spawnedArrows[i].arrowY < 80 && spawnedArrows[i].arrowY >-10 && element == spawnedArrows[i].direction) 
             {
                 //remove arrow
                 spawnedArrows.splice(i,1);
@@ -536,11 +559,14 @@ const draw = (params={}, time=0) =>{
             
             updateScore();
         }
+            
+        });
+        
     }
     //if key wasn't pressed in time delete arrow
     for(let i = 0; i < spawnedArrows.length; i++){
         //removes arrow once it's gone past the height height they're removed ( (spawnedArrows[i].arrowY < 50) )
-        if(spawnedArrows[i].arrowY < -10) 
+        if(spawnedArrows[i].arrowY < -20) 
         {
             spawnedArrows.splice(i,1);
 
@@ -552,23 +578,17 @@ const draw = (params={}, time=0) =>{
         spawnedArrows[i].updateArrow(size, deltaTime,scrollSpeed);
         updateScore();
     }
-    currentKeyPressed = 0;
-
+    //currentKeyPressed = 0;
+  
+ 
     //#endregion ARROW MANAGER
 
 
     //drawing pop ups
-    if (displayedPopups.length != 0)
+    if(lastPressedDeltaTime > 0.001)
     {
-        for(let i = 0; i < displayedPopups.length; i++)
-        {
-            displayedPopups[i].updatePopup();
-            if(displayedPopups[i].framesDisplayed == 0)
-            {
-                displayedPopups.splice(i,1);
-            }  
-            
-        }
+        lastPressedDeltaTime = 0;
+        currentKeyPressed = [];
     }
 
 
@@ -662,6 +682,8 @@ const resetScore = () =>
 {
     score = 0;
     totalScore = 0;
+    maxCombo = 0;
+    combo = 0;
 }
 
 const resetCombo = () =>
