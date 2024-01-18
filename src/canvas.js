@@ -157,11 +157,7 @@ class popUp {
         this.xValue = utils.getRandom(50,200);
     }
     
-    updatePopup = () =>
-    {
-        this.drawPopup();
-        this.framesDisplayed -=1;
-    }
+    
     drawPopup = () =>
     {
         ctx.save();
@@ -170,6 +166,11 @@ class popUp {
         //utils.getRandom(50,200)
         ctx.fillText(this.textDisplayed, this.xValue,30);
         ctx.restore();
+    }
+    updatePopup = () =>
+    {
+        this.drawPopup();
+        this.framesDisplayed -=1;
     }
 }
 
@@ -584,13 +585,26 @@ const draw = (params={}, time=0) =>{
     //#endregion ARROW MANAGER
 
 
-    //drawing pop ups
+    //key pressed management
     if(lastPressedDeltaTime > 0.001)
     {
         lastPressedDeltaTime = 0;
         currentKeyPressed = [];
     }
 
+    //drawing pop ups
+    if (displayedPopups.length != 0)
+    {
+        for(let i = 0; i < displayedPopups.length; i++)
+        {
+            displayedPopups[i].updatePopup();
+            if(displayedPopups[i].framesDisplayed == 0)
+            {
+                displayedPopups.splice(i,1);
+            }  
+            
+        }
+    }
 
 
 
