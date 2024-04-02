@@ -183,6 +183,7 @@ const setupUI = (canvasElement) =>{
   let trackUpload = document.querySelector("#trackUpload");
   trackUpload.onchange = (e) => {
     const files = e.target.files;
+    canvas.resetScore();
     audio.loadSoundFile( URL.createObjectURL(files[0]));
     if(playButton.dataset.playing == "yes"){
         playButton.dispatchEvent(new MouseEvent("click"));
