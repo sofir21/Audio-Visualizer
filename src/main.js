@@ -78,13 +78,29 @@ const jsonLoaded = json =>
     
 }
 
+//pausing with space and esc
+const keyPauseCheck = (e) =>
+{
+   if(e.keyCode == 32 || e.keyCode == 27){
+    // if track is playing, pause it
+    audio.pauseCurrentSound();
+    e.target.dataset.playing = "no";    // our css will set the text to "Play"
+   }
+   else if(e.keyCode == 32 || e.keyCode == 27)
+   {
+    // if track is currently paused, play it
+    audio.playCurrentSound();
+    e.target.dataset.playing = "yes";   // our css will set the text to "Pause"
+   }
+}
+
 const loop = () => {
 
-    // requestAnimationFrame(loop);
     setTimeout(() => {
       loop()
     }, 1000/60);
     canvas.draw(drawParams);
+    keyPauseCheck();
 
 }
 
@@ -118,13 +134,17 @@ const setupUI = (canvasElement) =>{
         audio.playCurrentSound();
         e.target.dataset.playing = "yes";   // our css will set the text to "Pause"
     }
-    // if track is playing, pause it
+    
     else
     {
         audio.pauseCurrentSound();
         e.target.dataset.playing = "no";    // our css will set the text to "Play"
     }
   };
+
+
+
+
 
   // C - hookup volume slider and label
   let volumeSlider = document.querySelector("#slider-volume");

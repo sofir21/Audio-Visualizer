@@ -109,6 +109,10 @@ const keyPressedValueCheck = (e) =>
 }
 //checks if key was pressed 
 addEventListener('keydown', keyPressedValueCheck, false);
+
+//keeps track if the last key pressed was a hit or a miss
+let successfulHit;
+
 //#endregion variables
 
 
