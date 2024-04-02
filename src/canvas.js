@@ -263,6 +263,9 @@ const setupCanvas = (canvasElement,analyserNodeRef, img) => {
     combo = 0;
     maxCombo = 0;
 
+    //hit or miss set up
+    successfulHit = true;
+
 
     
 
@@ -333,8 +336,15 @@ const draw = (params={}, time=0) =>{
     
                 const red = 250 * (i/audioDataWF.length);
                 const green = 0;
-                const blue = barHeight + (2 * (i/audioDataWF.length));    
-                ctx.fillStyle = "rgb(" + red + "," + green + "," + blue + ")";
+                const blue = barHeight + (2 * (i/audioDataWF.length));   
+                if(!successfulHit)
+                {
+                    ctx.fillStyle = "rgb(" + red + "," + 0 + "," + 0 + ")"
+                } 
+                else{
+                    ctx.fillStyle = "rgb(" + red + "," + green + "," + blue + ")";
+                }
+                
                 ctx.fillRect(x, canvasHeight - barHeight, barWidth, barHeight);
                 x += barWidth + 1;
             }
@@ -431,7 +441,10 @@ const draw = (params={}, time=0) =>{
     percentKobeni /= (audioData.length / 2);
     danceSpeed =  danceSpeedSelection * percentKobeni ; //kobeni's sprite changes to the music
     if(danceTimer > (3/danceSpeed)){
-        kobeni.updateFrame(); //changes sprite 
+        if(successfulHit)
+        {
+            kobeni.updateFrame(); //changes sprite 
+        }
         danceTimer = 0;
     }
     kobeni.drawKobeni();
@@ -558,6 +571,7 @@ const draw = (params={}, time=0) =>{
 
                 //visual feedback
                 displayedPopups.push(new popUp(`Hit!`, 10, "gray"));
+                successfulHit = true;
                 
 
             }           
@@ -577,6 +591,7 @@ const draw = (params={}, time=0) =>{
 
             //miss visual feedback
             displayedPopups.push(new popUp(`Miss!`, 10, "maroon"));
+            successfulHit = false;
             resetCombo(); //reset combo
             break;
         }           
